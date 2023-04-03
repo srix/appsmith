@@ -12,7 +12,7 @@ class EditorLoader extends React.PureComponent<any, { Page: any }> {
   }
 
   componentDidMount() {
-    retryPromise(() => import(/* webpackChunkName: "editor" */ "./index")).then(
+    retryPromise(() => import(/* webpackChunkName: "editor" */ "./IDE")).then(
       (module) => {
         this.setState({ Page: module.default });
       },

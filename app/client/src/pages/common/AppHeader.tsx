@@ -18,7 +18,6 @@ import {
 import Navigation from "pages/AppViewer/Navigation";
 import type { RouteComponentProps } from "react-router";
 import { withRouter } from "react-router";
-import AppEditorHeader from "pages/Editor/EditorHeader";
 
 type Props = RouteComponentProps;
 
@@ -40,10 +39,10 @@ class AppHeader extends React.Component<Props, any> {
         <Route component={undefined} path={USER_AUTH_URL} />
         <Route path={SETUP} />
         <Route path={SIGNUP_SUCCESS_URL} />
-        <Route component={AppEditorHeader} path={BUILDER_PATH_DEPRECATED} />
+        <Route path={BUILDER_PATH_DEPRECATED} />
         <Route component={Navigation} path={VIEWER_PATH_DEPRECATED} />
-        <Route component={AppEditorHeader} path={BUILDER_PATH} />
-        <Route component={AppEditorHeader} path={BUILDER_CUSTOM_PATH} />
+        <Route path={BUILDER_PATH} />
+        <Route path={BUILDER_CUSTOM_PATH} />
         <Route component={Navigation} path={VIEWER_PATH} />
         <Route component={Navigation} path={VIEWER_CUSTOM_PATH} />
         <Route component={PageHeader} path={BASE_URL} />
