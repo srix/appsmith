@@ -108,15 +108,6 @@ ff4j:
           - name: emails
             value: raksha@appsmith.com,ankita@appsmith.com,nilesh@appsmith.com,akhil@appsmith.com,trisha@appsmith.com
 
-    - uid: LAZY_CANVAS_RENDERING
-      enable: true
-      description: Enable Canvas to lazily render widgets below the fold
-      flipstrategy:
-        class: com.appsmith.server.featureflags.strategies.EmailBasedRolloutStrategy
-        param:
-          - name: emailDomains
-            value: appsmith.com
-
     - uid: ORACLE_PLUGIN
       enable: true
       description: Selectively show Oracle DB integration
