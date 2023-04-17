@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Caption, Space, Title } from "../components/StyledComponents";
+import { Container, Space } from "../components/StyledComponents";
 
 import {
   CANNOT_MERGE_DUE_TO_UNCOMMITTED_CHANGES,
@@ -11,7 +11,6 @@ import {
   MERGED_SUCCESSFULLY,
   SELECT_BRANCH_TO_MERGE,
 } from "@appsmith/constants/messages";
-import { ReactComponent as LeftArrow } from "assets/icons/ads/arrow-left-1.svg";
 
 import styled, { useTheme } from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
@@ -43,8 +42,7 @@ import Statusbar, {
 import { getIsStartingWithRemoteBranches } from "pages/Editor/gitSync/utils";
 import { Classes } from "../constants";
 import SuccessTick from "pages/common/SuccessTick";
-import { Case, Dropdown, Text, TextType } from "design-system-old";
-import { Button } from "design-system";
+import { Button, Option, Select, Text, Icon } from "design-system";
 import { Colors } from "constants/Colors";
 import AnalyticsUtil from "utils/AnalyticsUtil";
 import type { Theme } from "constants/DefaultTheme";
@@ -55,7 +53,6 @@ const Row = styled.div`
 `;
 
 const DEFAULT_OPTION = "--Select--";
-const DROPDOWNMENU_MAXHEIGHT = "350px";
 
 function MergeSuccessIndicator() {
   const theme = useTheme() as Theme;
@@ -64,11 +61,9 @@ function MergeSuccessIndicator() {
     <div style={{ display: "flex", alignItems: "center" }}>
       <SuccessTick height="36px" style={{ marginBottom: 0 }} width="30px" />
       <Text
-        case={Case.UPPERCASE}
-        color={Colors.GREY_9}
+        color={"var(--ads-v2-color-fg)"}
+        kind="heading-s"
         style={{ marginLeft: theme.spaces[2] }}
-        type={TextType.P1}
-        weight="600"
       >
         {createMessage(MERGED_SUCCESSFULLY)}
       </Text>
@@ -225,43 +220,40 @@ export default function Merge() {
   const gitConflictDocumentUrl = useSelector(getConflictFoundDocUrlMerge);
 
   return (
-    <>
-      <Title>{createMessage(MERGE_CHANGES)}</Title>
-      <Caption>{createMessage(SELECT_BRANCH_TO_MERGE)}</Caption>
+    <Container>
+      <Space size={2} />
+      <Text>{createMessage(SELECT_BRANCH_TO_MERGE)}</Text>
       <Space size={4} />
       <Row>
-        <Dropdown
-          className={Classes.MERGE_DROPDOWN}
-          containerClassName={"t--merge-branch-dropdown-destination"}
-          disabled={isFetchingBranches || isFetchingMergeStatus || isMerging}
-          dropdownMaxHeight={DROPDOWNMENU_MAXHEIGHT}
-          enableSearch
-          fillOptions
-          hasError={status === MERGE_STATUS_STATE.NOT_MERGEABLE}
-          isLoading={isFetchingBranches}
+        <Select
+          className="t--merge-branch-dropdown-destination"
+          dropdownClassName={Classes.MERGE_DROPDOWN}
+          isDisabled={isFetchingBranches || isFetchingMergeStatus || isMerging}
+          isValid={status !== MERGE_STATUS_STATE.NOT_MERGEABLE}
           onSelect={(value?: string) => {
             if (value) setSelectedBranchOption({ label: value, value: value });
           }}
-          options={branchList}
-          selected={selectedBranchOption}
-          showLabelOnly
-          truncateOption
-          width={"220px"}
-        />
+          showSearch
+          size="md"
+          value={selectedBranchOption}
+        >
+          {branchList.map((branch) => (
+            <Option key={branch.value}>{branch.value}</Option>
+          ))}
+        </Select>
 
         <Space horizontal size={3} />
-        <LeftArrow />
+        <Icon color={Colors.GREY_9} name="arrow-left" size="md" />
         <Space horizontal size={3} />
-        <Dropdown
+        <Select
           className="textInput"
-          disabled
-          dropdownMaxHeight={DROPDOWNMENU_MAXHEIGHT}
-          onSelect={() => null}
+          isDisabled
           options={[currentBranchDropdownOption]}
-          selected={currentBranchDropdownOption}
-          truncateOption
-          width={"220px"}
-        />
+          size="md"
+          value={currentBranchDropdownOption}
+        >
+          <Option>{currentBranchDropdownOption.label}</Option>
+        </Select>
       </Row>
       <MergeStatus message={mergeStatusMessage} status={status} />
       <Space size={10} />
@@ -284,6 +276,7 @@ export default function Merge() {
             isDisabled={mergeBtnDisabled}
             isLoading={isMerging}
             onClick={mergeHandler}
+            size="md"
           >
             {createMessage(MERGE_CHANGES)}
           </Button>
@@ -298,6 +291,6 @@ export default function Merge() {
           />
         </StatusbarWrapper>
       )}
-    </>
+    </Container>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { getTypographyByKey, TextInput } from "design-system-old";
+import { getTypographyByKey } from "design-system-old";
 import styled, { useTheme } from "styled-components";
 import { Colors } from "constants/Colors";
 import { useDispatch, useSelector } from "react-redux";
@@ -28,10 +28,15 @@ import {
   SWITCH_BRANCHES,
   SYNC_BRANCHES,
 } from "@appsmith/constants/messages";
-import { Space } from "./StyledComponents";
-import { Icon, Spinner } from "design-system";
+import {
+  Icon,
+  Spinner,
+  Tooltip,
+  Button,
+  SearchInput,
+  Text,
+} from "design-system";
 import { get } from "lodash";
-import { TooltipComponent as Tooltip } from "design-system-old";
 import {
   isLocalBranch,
   isRemoteBranch,
@@ -58,6 +63,7 @@ const BranchDropdownContainer = styled.div`
 
   & .title {
     ${getTypographyByKey("p1")};
+    color: var(--ads-v2-color-fg-emphasis-plus);
   }
 
   padding: ${(props) => props.theme.spaces[5]}px;
@@ -183,37 +189,36 @@ export function Header({
       }}
     >
       <div style={{ display: "flex", alignItems: "center" }}>
-        <span className="title">{title}</span>
+        <Text className="title" color={"var(--ads-v2-color-fg-emphasis)"}>
+          {title}
+        </Text>
         <span
           style={{
             display: "inline-block",
             marginLeft: get(theme, "spaces[1]"),
           }}
         >
-          <Tooltip
-            content={createMessage(SYNC_BRANCHES)}
-            hoverOpenDelay={10}
-            modifiers={{
-              flip: { enabled: false },
-            }}
-            position="top"
-          >
-            <Icon
+          <Tooltip content={createMessage(SYNC_BRANCHES)} placement="top">
+            <Button
               className="t--sync-branches"
               color={get(theme, "colors.gitSyncModal.closeIcon")}
-              name="refresh"
+              isIconButton
+              kind="tertiary"
               onClick={fetchBranches}
-              size="lg"
+              size="md"
+              startIcon="refresh"
             />
           </Tooltip>
         </span>
       </div>
-      <Icon
+      <Button
         className="t--close-branch-list"
         color={get(theme, "colors.gitSyncModal.closeIcon")}
-        name="close-modal"
+        isIconButton
+        kind="tertiary"
         onClick={closePopup}
-        size="lg"
+        size="md"
+        startIcon="close-modal"
       />
     </div>
   );
@@ -337,7 +342,6 @@ export default function BranchList(props: {
           }}
           fetchBranches={pruneAndFetchBranches}
         />
-        <Space size={4} />
         <div style={{ width: 300 }}>
           {fetchingBranches && (
             <div style={{ width: "100%", height: textInputHeight }}>
@@ -345,7 +349,7 @@ export default function BranchList(props: {
             </div>
           )}
           {!fetchingBranches && (
-            <TextInput
+            <SearchInput
               autoFocus
               className="branch-search t--branch-search-input"
               fill

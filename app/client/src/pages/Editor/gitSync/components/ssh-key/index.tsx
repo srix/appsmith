@@ -5,11 +5,9 @@ import {
   SSH_KEY_GENERATED,
 } from "@appsmith/constants/messages";
 import React, { useCallback, useState } from "react";
-import { Menu, Text, TextType } from "design-system-old";
 import Key2LineIcon from "remixicon-react/Key2LineIcon";
 import { Space } from "pages/Editor/gitSync/components/StyledComponents";
 import AnalyticsUtil from "utils/AnalyticsUtil";
-import { Position } from "@blueprintjs/core";
 import { useSSHKeyPair } from "../../hooks";
 import {
   DeployedKeyContainer,
@@ -17,16 +15,21 @@ import {
   KeyText,
   KeyType,
   MoreMenuWrapper,
-  MoreOptionsContainer,
-  RegenerateOptionsHeader,
 } from "./StyledComponents";
 import { CopySSHKey } from "./CopySSHKey";
 import { supportedKeyTypeList } from "./SupportedKeyTypeList";
 import getNotificationBanner from "./getNotificationBanner";
 import { getConfirmMenuItem } from "./getConfirmMenuItem";
-import { getMenuItems } from "./getMenuItems";
 import type { SSHKeyType } from "actions/gitSyncActions";
-import { Button, toast } from "design-system";
+import {
+  Button,
+  toast,
+  Menu,
+  MenuTrigger,
+  MenuItem,
+  MenuContent,
+  Text,
+} from "design-system";
 
 type KeysProps = {
   copyToClipboard: () => void;
@@ -64,7 +67,6 @@ function Keys(props: KeysProps) {
     AnalyticsUtil.logEvent("GS_GIT_DOCUMENTATION_LINK_CLICK", {
       source: "SSH_KEY_ON_GIT_CONNECTION_TAB",
     });
-    window.open(deployKeyDocUrl, "_blank");
   };
   const regenerateKey = useCallback(() => {
     AnalyticsUtil.logEvent("GS_REGENERATE_SSH_KEY_CONFIRM_CLICK", {
@@ -81,8 +83,8 @@ function Keys(props: KeysProps) {
   }, [newKeyType]);
   return (
     <>
-      <Space size={7} />
-      <Text color={Colors.GREY_9} type={TextType.P1}>
+      <Space size={2} />
+      <Text color="var(--ads-v2-color-border-brand-secondary)" renderAs="label">
         {createMessage(SSH_KEY)}
       </Text>
       <FlexRow style={{ position: "relative" }}>
@@ -91,7 +93,7 @@ function Keys(props: KeysProps) {
             <Key2LineIcon
               color={Colors.DOVE_GRAY2}
               size={20}
-              style={{ marginTop: -1, marginRight: 4 }}
+              style={{ marginTop: -3, marginRight: 4 }}
             />
             <KeyType keyType={exactKeyType}>{keyType}</KeyType>
             <KeyText keyType={exactKeyType}>{keyText}</KeyText>
@@ -99,52 +101,43 @@ function Keys(props: KeysProps) {
           </FlexRow>
         </DeployedKeyContainer>
         <MoreMenuWrapper>
-          <Menu
-            className="more"
-            onClosing={() => {
-              setIsMenuOpen(false);
-              setShowConfirmation(false);
-            }}
-            onOpening={() => {
-              setShowConfirmation(false);
-            }}
-            position={Position.BOTTOM}
-            target={
-              <MoreOptionsContainer>
-                <Button
-                  isIconButton
-                  kind="tertiary"
-                  onClick={() => {
-                    AnalyticsUtil.logEvent("GS_REGENERATE_SSH_KEY_MORE_CLICK");
-                    setShowConfirmation(false);
-                    setIsMenuOpen(!isMenuOpen);
+          <Menu modal>
+            <MenuTrigger>
+              <Button
+                isIconButton
+                kind="tertiary"
+                onClick={() => {
+                  AnalyticsUtil.logEvent("GS_REGENERATE_SSH_KEY_MORE_CLICK");
+                  setShowConfirmation(false);
+                }}
+                size="md"
+                startIcon="more-2-fill"
+              />
+            </MenuTrigger>
+            <MenuContent width="150px">
+              {supportedKeys.map((supportedKey) => (
+                <MenuItem
+                  className={`t--regenerate-sshkey-${supportedKey.protocolName}`}
+                  key={`supported-key-${supportedKey.protocolName}-menu-item`}
+                  onSelect={() => {
+                    setShowConfirmation(true);
+                    setNewKeyType(supportedKey.protocolName);
                   }}
-                  size="sm"
-                  startIcon="more-2-fill"
-                />
-              </MoreOptionsContainer>
-            }
-          >
-            {isMenuOpen && !showConfirmation && (
-              <>
-                <RegenerateOptionsHeader>
-                  Regenerate keys
-                </RegenerateOptionsHeader>
-                {getMenuItems(
-                  supportedKeys,
-                  setShowConfirmation,
-                  setNewKeyType,
-                )}
-              </>
-            )}
-            {isMenuOpen &&
-              showConfirmation &&
-              getConfirmMenuItem(regenerateKey)}
+                  startIcon={supportedKey.generated ? "check-line" : undefined}
+                >
+                  {supportedKey.text}
+                </MenuItem>
+              ))}
+              {isMenuOpen &&
+                showConfirmation &&
+                getConfirmMenuItem(regenerateKey)}
+            </MenuContent>
           </Menu>
         </MoreMenuWrapper>
       </FlexRow>
       {showKeyGeneratedMessage &&
         getNotificationBanner(
+          deployKeyDocUrl,
           learnMoreClickHandler,
           setShowKeyGeneratedMessage,
         )}
